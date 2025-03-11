@@ -1,9 +1,7 @@
 import { toast } from "@/components/ui/use-toast";
 
-// This is a placeholder for a YouTube API key. In a real app, this would be stored in an environment variable.
-// Note: For a frontend-only application, the key will be exposed in the browser. For a production app,
-// you should proxy these requests through a backend.
-const API_KEY = 'YOUR_YOUTUBE_API_KEY';
+// Using the provided YouTube API key
+const API_KEY = 'AIzaSyCJn8TEj8CnJdgZP2MLhQjI8C2Q0051oxg';
 
 const BASE_URL = 'https://www.googleapis.com/youtube/v3';
 
@@ -214,9 +212,15 @@ const mockCategories: Category[] = [
   { id: '28', snippet: { title: 'Science & Technology' } }
 ];
 
-// Check if we should use mock data
-const shouldUseMockData = () => {
-  return API_KEY === 'YOUR_YOUTUBE_API_KEY';
+// Updated to only use mock data if API request fails
+const shouldUseMockData = (error: any) => {
+  console.error('API Error:', error);
+  toast({
+    title: "API Error",
+    description: "Using mock data as fallback.",
+    variant: "destructive",
+  });
+  return true;
 };
 
 export const fetchPopularVideos = async (
@@ -226,24 +230,6 @@ export const fetchPopularVideos = async (
   categoryId?: string
 ): Promise<VideoListResponse> => {
   try {
-    // If API key is not set, use mock data
-    if (shouldUseMockData()) {
-      console.log('[Mock] Fetching popular videos');
-      const allMockVideos = generateMockVideos(24);
-      
-      // Filter by category if needed
-      let filteredVideos = allMockVideos;
-      if (categoryId) {
-        // For mock data, just return a subset to simulate category filter
-        filteredVideos = allMockVideos.slice(0, 8);
-      }
-      
-      return {
-        items: filteredVideos.slice(0, maxResults),
-        nextPageToken: 'mockNextPageToken'
-      };
-    }
-    
     let url = `${BASE_URL}/videos?part=snippet,statistics&chart=mostPopular&regionCode=${regionCode}&maxResults=${maxResults}&key=${API_KEY}`;
     
     if (pageToken) {
@@ -271,14 +257,7 @@ export const fetchPopularVideos = async (
     };
   } catch (error) {
     console.error('Error fetching popular videos:', error);
-    if (!shouldUseMockData()) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch popular videos. Please try again later.",
-        variant: "destructive",
-      });
-    }
-    return shouldUseMockData() 
+    return shouldUseMockData(error) 
       ? { items: generateMockVideos(maxResults) } 
       : { items: [] };
   }
@@ -289,7 +268,7 @@ export const fetchVideoCategories = async (
 ): Promise<Category[]> => {
   try {
     // If API key is not set, use mock data
-    if (shouldUseMockData()) {
+    if (API_KEY === 'YOUR_YOUTUBE_API_KEY') {
       console.log('[Mock] Fetching video categories');
       return mockCategories;
     }
@@ -310,14 +289,12 @@ export const fetchVideoCategories = async (
     }));
   } catch (error) {
     console.error('Error fetching video categories:', error);
-    if (!shouldUseMockData()) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch video categories. Please try again later.",
-        variant: "destructive",
-      });
-    }
-    return shouldUseMockData() ? mockCategories : [];
+    toast({
+      title: "Error",
+      description: "Failed to fetch video categories. Please try again later.",
+      variant: "destructive",
+    });
+    return mockCategories;
   }
 };
 
@@ -457,4 +434,3 @@ export const fetchChannelDetails = async (channelId: string): Promise<any> => {
     return null;
   }
 };
-
