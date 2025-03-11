@@ -190,7 +190,7 @@ const Watch = () => {
                         {formatPublishedDate(videoDetails.snippet.publishedAt)}
                       </span>
                       
-                      {videoDetails.snippet.tags && videoDetails.snippet.tags.slice(0, 3).map((tag: string) => (
+                      {videoDetails.snippet.tags && videoDetails.snippet.tags?.slice(0, 3).map((tag: string) => (
                         <Badge key={tag} variant="outline" className="mr-1 bg-transparent text-youtube-gray">
                           #{tag}
                         </Badge>

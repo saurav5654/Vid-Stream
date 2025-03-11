@@ -28,20 +28,22 @@ const Index = () => {
   const { data: videos = [], isLoading: isVideosLoading } = useQuery({
     queryKey: ['popularVideos', selectedCategoryId],
     queryFn: async () => {
-      const result = await fetchPopularVideos(
-        undefined,
-        'US',
-        24,
-        selectedCategoryId === '0' ? undefined : selectedCategoryId
-      );
-      return result.items;
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to load videos. Please try again later.",
-        variant: "destructive",
-      });
+      try {
+        const result = await fetchPopularVideos(
+          undefined,
+          'US',
+          24,
+          selectedCategoryId === '0' ? undefined : selectedCategoryId
+        );
+        return result.items;
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load videos. Please try again later.",
+          variant: "destructive",
+        });
+        return [];
+      }
     },
   });
 

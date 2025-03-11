@@ -6,7 +6,7 @@ import Sidebar from '@/components/Sidebar';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
   Flame, Music2, Film, GamepadIcon, Newspaper, Trophy, 
-  Lightbulb, Shirt, ShoppingBag, Award, Broadcast 
+  Lightbulb, Shirt, ShoppingBag, Award, Radio 
 } from 'lucide-react';
 
 const categories = [
@@ -20,7 +20,7 @@ const categories = [
   { id: 'fashion', name: 'Fashion', icon: Shirt, color: 'bg-cyan-500', path: '/fashion' },
   { id: 'shopping', name: 'Shopping', icon: ShoppingBag, color: 'bg-emerald-500', path: '/shopping' },
   { id: 'premieres', name: 'Premieres', icon: Award, color: 'bg-amber-500', path: '/premieres' },
-  { id: 'live', name: 'Live', icon: Broadcast, color: 'bg-rose-500', path: '/live' },
+  { id: 'live', name: 'Live', icon: Radio, color: 'bg-rose-500', path: '/live' },
 ];
 
 const Explore = () => {

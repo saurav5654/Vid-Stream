@@ -15,20 +15,22 @@ const Trending = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['trendingVideos', category],
     queryFn: async () => {
-      const videoCategoryId = category === 'all' ? undefined : 
+      try {
+        const videoCategoryId = category === 'all' ? undefined : 
                              category === 'music' ? '10' : 
                              category === 'gaming' ? '20' : 
                              category === 'movies' ? '1' : undefined;
-      
-      const result = await fetchPopularVideos(undefined, 'US', 20, videoCategoryId);
-      return result.items;
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to load trending videos. Please try again later.",
-        variant: "destructive",
-      });
+        
+        const result = await fetchPopularVideos(undefined, 'US', 20, videoCategoryId);
+        return result.items;
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load trending videos. Please try again later.",
+          variant: "destructive",
+        });
+        return [];
+      }
     },
   });
 

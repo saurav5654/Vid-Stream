@@ -33,6 +33,7 @@ export interface Video {
         height: number;
       };
     };
+    tags?: string[];
   };
   statistics?: {
     viewCount: string;

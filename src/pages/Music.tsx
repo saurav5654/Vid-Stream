@@ -15,16 +15,18 @@ const Music = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['musicVideos'],
     queryFn: async () => {
-      // Fetch music category videos (category ID 10 is for Music)
-      const result = await fetchPopularVideos(undefined, 'US', 24, '10');
-      return result.items;
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to load music videos. Please try again later.",
-        variant: "destructive",
-      });
+      try {
+        // Fetch music category videos (category ID 10 is for Music)
+        const result = await fetchPopularVideos(undefined, 'US', 24, '10');
+        return result.items;
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load music videos. Please try again later.",
+          variant: "destructive",
+        });
+        return [];
+      }
     },
   });
 
