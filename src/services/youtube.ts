@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/use-toast";
 
 // This is a placeholder for a YouTube API key. In a real app, this would be stored in an environment variable.
@@ -58,6 +57,168 @@ export interface CategoryListResponse {
   items: Category[];
 }
 
+// Mock data to use when API key is not provided
+const mockVideos: Video[] = [
+  {
+    id: 'video1',
+    snippet: {
+      title: 'Sample Video 1',
+      description: 'This is a sample video description.',
+      channelTitle: 'Demo Channel',
+      channelId: 'channel1',
+      publishedAt: new Date().toISOString(),
+      thumbnails: {
+        default: {
+          url: 'https://picsum.photos/120/90',
+          width: 120,
+          height: 90
+        },
+        medium: {
+          url: 'https://picsum.photos/320/180',
+          width: 320,
+          height: 180
+        },
+        high: {
+          url: 'https://picsum.photos/480/360',
+          width: 480,
+          height: 360
+        }
+      },
+      tags: ['sample', 'video', 'demo']
+    },
+    statistics: {
+      viewCount: '10243',
+      likeCount: '542',
+      commentCount: '31'
+    }
+  },
+  {
+    id: 'video2',
+    snippet: {
+      title: 'Sample Video 2',
+      description: 'This is another sample video description.',
+      channelTitle: 'Demo Channel',
+      channelId: 'channel1',
+      publishedAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+      thumbnails: {
+        default: {
+          url: 'https://picsum.photos/120/90?random=1',
+          width: 120,
+          height: 90
+        },
+        medium: {
+          url: 'https://picsum.photos/320/180?random=1',
+          width: 320,
+          height: 180
+        },
+        high: {
+          url: 'https://picsum.photos/480/360?random=1',
+          width: 480,
+          height: 360
+        }
+      }
+    },
+    statistics: {
+      viewCount: '8753',
+      likeCount: '421',
+      commentCount: '25'
+    }
+  },
+  {
+    id: 'video3',
+    snippet: {
+      title: 'Sample Video 3',
+      description: 'This is yet another sample video description.',
+      channelTitle: 'Another Channel',
+      channelId: 'channel2',
+      publishedAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+      thumbnails: {
+        default: {
+          url: 'https://picsum.photos/120/90?random=2',
+          width: 120,
+          height: 90
+        },
+        medium: {
+          url: 'https://picsum.photos/320/180?random=2',
+          width: 320,
+          height: 180
+        },
+        high: {
+          url: 'https://picsum.photos/480/360?random=2',
+          width: 480,
+          height: 360
+        }
+      },
+      tags: ['tutorial', 'example']
+    },
+    statistics: {
+      viewCount: '15642',
+      likeCount: '834',
+      commentCount: '67'
+    }
+  }
+];
+
+// Generate more mock videos for a better demo experience
+const generateMockVideos = (count: number): Video[] => {
+  const result: Video[] = [...mockVideos];
+  
+  for (let i = 4; i <= count; i++) {
+    result.push({
+      id: `video${i}`,
+      snippet: {
+        title: `Sample Video ${i}`,
+        description: `This is sample video ${i} description.`,
+        channelTitle: i % 2 === 0 ? 'Demo Channel' : 'Another Channel',
+        channelId: i % 2 === 0 ? 'channel1' : 'channel2',
+        publishedAt: new Date(Date.now() - i * 43200000).toISOString(), // i * 12 hours ago
+        thumbnails: {
+          default: {
+            url: `https://picsum.photos/120/90?random=${i}`,
+            width: 120,
+            height: 90
+          },
+          medium: {
+            url: `https://picsum.photos/320/180?random=${i}`,
+            width: 320,
+            height: 180
+          },
+          high: {
+            url: `https://picsum.photos/480/360?random=${i}`,
+            width: 480,
+            height: 360
+          }
+        },
+        tags: i % 3 === 0 ? ['demo', 'sample'] : undefined
+      },
+      statistics: {
+        viewCount: `${Math.floor(Math.random() * 50000)}`,
+        likeCount: `${Math.floor(Math.random() * 5000)}`,
+        commentCount: `${Math.floor(Math.random() * 500)}`
+      }
+    });
+  }
+  
+  return result;
+};
+
+const mockCategories: Category[] = [
+  { id: '10', snippet: { title: 'Music' } },
+  { id: '20', snippet: { title: 'Gaming' } },
+  { id: '1', snippet: { title: 'Film & Animation' } },
+  { id: '2', snippet: { title: 'Autos & Vehicles' } },
+  { id: '15', snippet: { title: 'Pets & Animals' } },
+  { id: '17', snippet: { title: 'Sports' } },
+  { id: '24', snippet: { title: 'Entertainment' } },
+  { id: '26', snippet: { title: 'Howto & Style' } },
+  { id: '28', snippet: { title: 'Science & Technology' } }
+];
+
+// Check if we should use mock data
+const shouldUseMockData = () => {
+  return API_KEY === 'YOUR_YOUTUBE_API_KEY';
+};
+
 export const fetchPopularVideos = async (
   pageToken?: string, 
   regionCode: string = 'US', 
@@ -65,6 +226,24 @@ export const fetchPopularVideos = async (
   categoryId?: string
 ): Promise<VideoListResponse> => {
   try {
+    // If API key is not set, use mock data
+    if (shouldUseMockData()) {
+      console.log('[Mock] Fetching popular videos');
+      const allMockVideos = generateMockVideos(24);
+      
+      // Filter by category if needed
+      let filteredVideos = allMockVideos;
+      if (categoryId) {
+        // For mock data, just return a subset to simulate category filter
+        filteredVideos = allMockVideos.slice(0, 8);
+      }
+      
+      return {
+        items: filteredVideos.slice(0, maxResults),
+        nextPageToken: 'mockNextPageToken'
+      };
+    }
+    
     let url = `${BASE_URL}/videos?part=snippet,statistics&chart=mostPopular&regionCode=${regionCode}&maxResults=${maxResults}&key=${API_KEY}`;
     
     if (pageToken) {
@@ -92,12 +271,16 @@ export const fetchPopularVideos = async (
     };
   } catch (error) {
     console.error('Error fetching popular videos:', error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch popular videos. Please try again later.",
-      variant: "destructive",
-    });
-    return { items: [] };
+    if (!shouldUseMockData()) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch popular videos. Please try again later.",
+        variant: "destructive",
+      });
+    }
+    return shouldUseMockData() 
+      ? { items: generateMockVideos(maxResults) } 
+      : { items: [] };
   }
 };
 
@@ -105,6 +288,12 @@ export const fetchVideoCategories = async (
   regionCode: string = 'US'
 ): Promise<Category[]> => {
   try {
+    // If API key is not set, use mock data
+    if (shouldUseMockData()) {
+      console.log('[Mock] Fetching video categories');
+      return mockCategories;
+    }
+    
     const url = `${BASE_URL}/videoCategories?part=snippet&regionCode=${regionCode}&key=${API_KEY}`;
     
     const response = await fetch(url);
@@ -121,12 +310,14 @@ export const fetchVideoCategories = async (
     }));
   } catch (error) {
     console.error('Error fetching video categories:', error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch video categories. Please try again later.",
-      variant: "destructive",
-    });
-    return [];
+    if (!shouldUseMockData()) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch video categories. Please try again later.",
+        variant: "destructive",
+      });
+    }
+    return shouldUseMockData() ? mockCategories : [];
   }
 };
 
@@ -266,3 +457,4 @@ export const fetchChannelDetails = async (channelId: string): Promise<any> => {
     return null;
   }
 };
+
