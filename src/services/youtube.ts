@@ -1,7 +1,11 @@
+
 import { toast } from "@/components/ui/use-toast";
 
 // Using the provided YouTube API key
 const API_KEY = 'AIzaSyCJn8TEj8CnJdgZP2MLhQjI8C2Q0051oxg';
+
+// A constant to check against when we want to use mock data
+const PLACEHOLDER_API_KEY = 'YOUR_YOUTUBE_API_KEY';
 
 const BASE_URL = 'https://www.googleapis.com/youtube/v3';
 
@@ -267,8 +271,10 @@ export const fetchVideoCategories = async (
   regionCode: string = 'US'
 ): Promise<Category[]> => {
   try {
-    // If API key is not set, use mock data
-    if (API_KEY === 'YOUR_YOUTUBE_API_KEY') {
+    // Updated logic to avoid string literal comparison
+    const isUsingProvidedKey = API_KEY !== PLACEHOLDER_API_KEY;
+    
+    if (!isUsingProvidedKey) {
       console.log('[Mock] Fetching video categories');
       return mockCategories;
     }
